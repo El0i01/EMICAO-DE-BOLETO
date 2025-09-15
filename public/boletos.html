@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boletos do Cliente</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="hero">
+
+  <div class="container">
+  <img src="/img/logo1bkp.svg" alt="Logo da Empresa" style="max-width:200px; margin-top:10px;">
+    <ul id="dados-cliente"></ul>
+    <div id="boleto-info"></div>
+  </div>
+  <script>
+    const dados = JSON.parse(localStorage.getItem('dadosBoletos') || '{}');
+    // função renderBoleto duplicada removida
+      let indiceBoleto = 0;
+      function atualizarPaginacao() {
+        const boletos = dados.boletos || [];
+        const paginacao = document.getElementById('paginacao-boletos');
+        if (paginacao) paginacao.textContent = `${indiceBoleto + 1} / ${boletos.length}`;
+      }
+
+      function mostrarBoleto(indice) {
+        const boletos = dados.boletos || [];
+        if (indice < 0 || indice >= boletos.length) return;
+        indiceBoleto = indice;
+        const b = boletos[indice];
+        const nomeCliente = dados.cliente?.nome || '-';
+        const cpfCliente = dados.cliente?.cpf || '-';
+        const valorFormatado = b.valor ? Number(b.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '-';
+        document.getElementById('boleto-info').innerHTML = `
+          <div class="boleto-dados">
+            <div class="boleto-nome">${nomeCliente}</div>
+            <div class="boleto-cpf">CPF: <strong>${cpfCliente}</strong></div>
+            <div class="boleto-status" style="font-size:1.05em;font-weight:600;margin-bottom:8px;">
+              ${b.situacao === 'PAGO' ? 'Status: Pago' :
+                (b.data_vencimento && new Date(b.data_vencimento.split('/').reverse().join('-')) < new Date() ? 'Status: Vencido' : 'Status: A vencer')}
+            </div>
+            <div class="info-cards">
+              <div class="info-card">
+                <div class="info-card-label">Valor</div>
+                <div>R$ ${valorFormatado}</div>
+              </div>
+              <div class="info-card">
+                <div class="info-card-label">Vencimento</div>
+                <div>${b.data_vencimento || '-'}</div>
+              </div>
+            </div>
+            <div style="font-size:0.95em;color:#333;margin-bottom:2px;">Boleto Nº <strong>${b.id || '-'}</strong></div>
+            <input id="linha-editavel" class="linha-editavel" value="${b.linha_digitavel || ''}" readonly />
+            <button class="copiar-btn" id="btn-copiar">Copiar</button>
+            <a href="${b.url_download || `/baixar-pdf?cpf=${encodeURIComponent(dados.cliente?.cpf || '')}&id=${b.id}`}" download="boleto-${b.id}.pdf" class="baixar-btn">Baixar PDF</a>
+          </div>
+          
+        `;
+        atualizarPaginacao();
+        document.getElementById('anterior-boleto').onclick = () => mostrarBoleto(indiceBoleto - 1);
+        document.getElementById('proximo-boleto').onclick = () => mostrarBoleto(indiceBoleto + 1);
+        // Corrigir copiar no mobile: usar event listener JS
+        const btnCopiar = document.getElementById('btn-copiar');
+        if (btnCopiar) {
+          btnCopiar.addEventListener('click', function() {
+            const input = document.getElementById('linha-editavel');
+            if (input) {
+              input.select();
+              input.setSelectionRange(0, 99999); // Para mobile
+              try {
+                document.execCommand('copy');
+              } catch (e) {
+                navigator.clipboard.writeText(input.value);
+              }
+            }
+          });
+        }
+      }
+
+      function renderBoleto() {
+        mostrarBoleto(0);
+      }
+
+      renderBoleto();
+  </script>
+</body>
+</html>
