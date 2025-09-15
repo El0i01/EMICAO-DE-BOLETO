@@ -7,9 +7,6 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - LOGIN=${LOGIN}
-      - SENHA=${SENHA}
-      - CPF=${CPF}
     volumes:
       - .:/app
     command: node src/server.js
