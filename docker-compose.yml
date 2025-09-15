@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: emicao_boleto_app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - LOGIN=${LOGIN}
+      - SENHA=${SENHA}
+      - CPF=${CPF}
+    volumes:
+      - .:/app
+    command: node src/server.js

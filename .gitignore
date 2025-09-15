@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.pdf
+boleto_base64.txt
+.DS_Store
+npm-debug.log
