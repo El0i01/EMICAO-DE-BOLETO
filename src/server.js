@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -52,9 +51,9 @@ app.get('/', (req, res) => {
 });
 
 
-// Endpoint para consulta de boletos por CPF
-app.post('/consultar-boleto', async (req, res) => {
-  const { cpf } = req.body;
+// Endpoint para consulta de boletos por CPF (GET para permitir requisição via API)
+app.get('/consultar-boleto', async (req, res) => {
+  const { cpf } = req.query;
   if (!cpf) return res.status(400).json({ error: 'CPF é obrigatório.' });
   try {
     const resultado = await consultarBoletosPorCPF(cpf);
@@ -81,7 +80,7 @@ app.get('/baixar-pdf', async (req, res) => {
   }
 });
 
-const PORT = 3000;
+const PORT = 3011;
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
