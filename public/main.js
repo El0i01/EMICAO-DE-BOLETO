@@ -14,10 +14,8 @@ function consultar() {
     return;
   }
   loadingDiv.style.display = 'block';
-  fetch('/consultar-boleto', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cpf })
+  fetch(`/consultar-boleto?cpf=${encodeURIComponent(cpf)}`, {
+    method: 'GET'
   })
     .then(res => res.json())
     .then(data => {
