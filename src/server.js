@@ -50,7 +50,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-
 // Endpoint para consulta de boletos por CPF (GET para permitir requisição via API)
 app.get('/consultar-boleto', async (req, res) => {
   const { cpf } = req.query;
@@ -77,6 +76,18 @@ app.get('/baixar-pdf', async (req, res) => {
     res.send(buffer);
   } catch (e) {
     res.status(500).send('Erro ao gerar PDF');
+  }
+});
+
+// Adicione este novo endpoint POST mantendo o GET existente
+app.post('/consultar-boleto', async (req, res) => {
+  const { cpf } = req.body;
+  if (!cpf) return res.status(400).json({ error: 'CPF é obrigatório.' });
+  try {
+    const resultado = await consultarBoletosPorCPF(cpf);
+    res.json(resultado);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 });
 
